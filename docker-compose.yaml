@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  backend:
+    command: sh -c "npm install && npm run dev"
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile.dev
+    ports:
+      - "3000:3000"
+    depends_on:
+      - "postgres"
+    volumes:
+      - .:/app
+      - /app/node_modules
+  frontend:
+    command: sh -c "npm install && npm run dev"
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile.dev
+    ports:
+      - "3001:3001"
+    depends_on:
+      - "backend"
+    volumes:
+      - .:/app
+      - /app/node_modules
+volumes:
+  postgres_data:
